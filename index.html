@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>所慶即時地圖</title>
+<style>
+:root{
+  --bg:#fcfdf8; --surface:#ffffff; --surface-2:#eff4ea;
+  --ink:#1b2a21; --muted:#5a6e62; --line:#e1e8da;
+  --accent:#e2932e; --accent-ink:#4a2c05;
+  --teal:#159179; --teal-ink:#ffffff;
+  --live:#e14b3f; --live-ink:#ffffff;
+  --good:#2fa968; --good-ink:#ffffff;
+  --font-display:'Noto Serif TC',serif;
+  --font-body:'Noto Sans TC',sans-serif;
+  color-scheme:light;
+}
+/* Fixed light theme on purpose: this is a shared event info page everyone
+   should see identically, regardless of each visitor's own phone setting. */
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:var(--font-body); font-size:18px;
+  margin:0;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+  padding-block:16px 48px;
+  max-width:720px; margin-inline:auto;
+}
+h1,h2,h3{font-family:var(--font-display); text-wrap:balance; margin:0}
+p{margin:0}
+.tab{font-variant-numeric:tabular-nums}
+button{font-family:inherit}
+img{max-width:100%}
+
+header.top{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:10px; flex-wrap:wrap}
+.htitle{display:flex; flex-direction:column; gap:1px}
+.eyebrow{font-size:12.5px; letter-spacing:.06em; color:var(--muted)}
+h1.title{font-size:24px; line-height:1.2}
+.clockbox{text-align:right}
+.clock{font-family:var(--font-display); font-size:22px}
+.daystate{font-size:13px; color:var(--muted)}
+
+.banner{
+  background:var(--live); color:var(--live-ink); border-radius:14px;
+  padding:12px 14px; margin-bottom:12px; font-size:15px; line-height:1.5;
+}
+.banner b{font-family:var(--font-display); font-size:13px; letter-spacing:.04em}
+
+.mapsection{width:100vw; margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw); margin-bottom:14px}
+.mapwrap{position:relative; width:100%; background:var(--surface); overflow:hidden; border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+.mapwrap img{display:block; width:100%; height:auto}
+.pin{
+  position:absolute; width:34px; height:34px; margin:-17px 0 0 -17px; border-radius:50%;
+  border:2.5px solid white; display:flex; align-items:center; justify-content:center;
+  font-size:16px; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.4); padding:0; line-height:1;
+  transition:transform .12s ease;
+}
+.pin:active{transform:scale(1.18)}
+.pin.cat-ceremony{background:var(--teal)}
+.pin.cat-competition{background:var(--accent)}
+.pin.cat-casual{background:var(--muted)}
+.pin.cat-market{background:var(--good)}
+.pin.islive{box-shadow:0 0 0 0 rgba(194,59,59,.6), 0 1px 4px rgba(0,0,0,.35); animation:pulse 1.8s infinite}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(194,59,59,.55), 0 1px 4px rgba(0,0,0,.35)}
+  70%{box-shadow:0 0 0 10px rgba(194,59,59,0), 0 1px 4px rgba(0,0,0,.35)}
+  100%{box-shadow:0 0 0 0 rgba(194,59,59,0), 0 1px 4px rgba(0,0,0,.35)}
+}
+@media (prefers-reduced-motion: reduce){ .pin.islive{animation:none} }
+.maphint{
+  font-size:13px; color:var(--muted); text-align:center; padding:6px max(16px, env(safe-area-inset-left,0px)) 0;
+}
+
+.quickrow{display:flex; gap:10px; margin-bottom:14px}
+.quickbtn{
+  flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; text-align:left;
+  background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:10px 12px; cursor:pointer; color:var(--ink);
+}
+.quickbtn .qg{font-size:13px; color:var(--muted)}
+.quickbtn .qs{font-size:15px; font-weight:700; overflow-wrap:break-word}
+.quickbtn .pill{margin-top:2px}
+
+.agendabtn{
+  display:flex; align-items:center; justify-content:center; gap:8px; width:100%;
+  background:var(--accent); border:none; border-radius:14px; padding:13px; margin-bottom:18px;
+  font-size:16px; font-weight:700; color:var(--accent-ink); cursor:pointer;
+}
+
+.pill{
+  display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700;
+  letter-spacing:.03em; padding:2px 8px; border-radius:999px; width:fit-content;
+}
+.pill.live{background:var(--live); color:var(--live-ink)}
+.pill.idle{background:var(--surface-2); color:var(--muted)}
+.pill .dot{width:5px; height:5px; border-radius:50%; background:currentColor}
+
+.toast{
+  position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:var(--ink); color:var(--bg);
+  padding:10px 16px; border-radius:999px; font-size:13px; opacity:0; pointer-events:none; transition:opacity .25s;
+  z-index:80; max-width:90vw; text-align:center;
+}
+.toast.show{opacity:1}
+
+/* ---- modal (venue / agenda) ---- */
+.modal{
+  position:fixed; inset:0; background:rgba(6,10,6,.72); z-index:70;
+  display:flex; align-items:flex-end; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .22s ease;
+}
+.modal.open{opacity:1; pointer-events:auto}
+.modalcard{
+  background:var(--bg); width:100%; max-width:720px; max-height:88vh; overflow-y:auto;
+  border-radius:22px 22px 0 0; padding:10px max(16px, env(safe-area-inset-right,0px)) max(20px, env(safe-area-inset-bottom,0px)) max(16px, env(safe-area-inset-left,0px));
+  box-shadow:0 -8px 40px rgba(0,0,0,.35);
+  transform:translateY(24px); transition:transform .25s cubic-bezier(.2,.8,.3,1);
+}
+.modal.open .modalcard{transform:translateY(0)}
+.modalcard::before{
+  content:""; display:block; width:40px; height:4px; border-radius:999px; background:var(--line); margin:4px auto 12px;
+}
+.modalhead{display:flex; align-items:flex-start; gap:10px; margin-bottom:10px}
+.modalhead .vicon{font-size:25px; line-height:1.3}
+.modalhead h3{font-size:20px}
+.modalhead .vsub{font-size:13px; color:var(--muted)}
+.modalhead .closebtn{
+  margin-left:auto; width:36px; height:36px; border-radius:50%; border:none; background:var(--surface-2);
+  color:var(--ink); font-size:16px; cursor:pointer; flex:none;
+}
+.vblock{border:1px solid var(--line); background:var(--surface); border-radius:14px; padding:12px 14px; margin-bottom:10px}
+.vblock.live{border-color:var(--live); background:color-mix(in srgb, var(--live) 10%, var(--surface))}
+.vblock.past{opacity:.55}
+.vblock-head{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
+.vtime{font-size:13px; color:var(--muted)}
+.vtitle{font-size:16.5px; font-weight:700}
+.bdetail{font-size:14.5px; color:var(--muted); margin-top:5px; line-height:1.5}
+.vnotes{font-size:14px; color:var(--muted); background:var(--surface-2); border-radius:12px; padding:11px 13px; line-height:1.6}
+.vnotes b{color:var(--ink); font-family:var(--font-display); font-size:13.5px}
+
+.bracket{margin-top:8px; display:flex; flex-direction:column; gap:8px}
+.bstage-label{font-size:12px; color:var(--muted); letter-spacing:.04em; margin-bottom:4px}
+.bstage-pending{font-size:14px; color:var(--muted); font-style:italic}
+.match{display:flex; justify-content:space-between; gap:10px; font-size:14.5px; padding:6px 0; border-top:1px solid var(--line)}
+.match:first-child{border-top:none}
+.mlabel{color:var(--muted); flex:none}
+.mteams{text-align:right; font-weight:600; overflow-wrap:break-word; min-width:0}
+
+.agendalist{display:flex; flex-direction:column; gap:2px}
+.agitem{
+  display:grid; grid-template-columns:56px 1fr; gap:10px; align-items:center; text-align:left;
+  background:none; border:none; border-top:1px solid var(--line); padding:11px 0; cursor:pointer; color:var(--ink);
+}
+.agitem:first-child{border-top:none}
+.agitem.past{opacity:.5}
+.agitem.live .agtitle{color:var(--live)}
+.agmain{display:flex; flex-direction:column; min-width:0}
+.agtitle{font-size:15.5px; font-weight:600}
+.agvenue{font-size:13px; color:var(--muted)}
+.nowbadge{display:inline-block; font-size:10.5px; font-weight:700; color:var(--live); border:1px solid var(--live); border-radius:999px; padding:0 5px; margin-left:5px; vertical-align:1px}
+
+.footnote{margin-top:26px; font-size:12px; color:var(--muted); text-align:center; line-height:1.6}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+</head>
+<body>
+
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const EVENT_DATE = "2026-10-31";
+
+const TEAM_SHORT = {
+  "企劃室+技推中心": "企劃+技推",
+  "工程中心": "工程中心",
+  "驗證中心+檢驗中心": "檢驗+驗證",
+  "所長室+行政室+會計室+產業學院": "所+行+會+產學",
+  "生資中心": "生資中心",
+  "產製中心": "產製中心",
+};
+function ts(name){ return TEAM_SHORT[name] || name; }
+
+const ROUNDS = {
+  shikong: [
+    {round:"第1輪", teams:["生資中心","工程中心"]},
+    {round:"第2輪", teams:["企劃室+技推中心","驗證中心+檢驗中心"]},
+    {round:"第3輪", teams:["所長室+行政室+會計室+產業學院","產製中心"]},
+  ],
+  fengli: [
+    {round:"第1輪", teams:["工程中心","所長室+行政室+會計室+產業學院"]},
+    {round:"第2輪", teams:["生資中心","企劃室+技推中心"]},
+    {round:"第3輪", teams:["產製中心","驗證中心+檢驗中心"]},
+  ],
+  niantu: [
+    {round:"第1輪", teams:["產製中心","工程中心","企劃室+技推中心"]},
+    {round:"第2輪", teams:["驗證中心+檢驗中心","生資中心","所長室+行政室+會計室+產業學院"]},
+  ],
+};
+
+const BRACKET_PRELIM = {
+  "九宮格": [
+    {m:"初賽1", teams:["工程中心","驗證中心+檢驗中心"]},
+    {m:"初賽2", teams:["所長室+行政室+會計室+產業學院","產製中心"]},
+    {m:"初賽3", teams:["企劃室+技推中心","生資中心"]},
+  ],
+  "同心協力": [
+    {m:"初賽1", teams:["產製中心","驗證中心+檢驗中心"]},
+    {m:"初賽2", teams:["所長室+行政室+會計室+產業學院","工程中心"]},
+    {m:"初賽3", teams:["企劃室+技推中心","生資中心"]},
+  ],
+};
+const BRACKET_LABEL = {"九宮格":"挑戰59九宮格", "同心協力":"同心協力大作戰"};
+
+const VENUES = [
+  {id:"siling", name:"司令台", cat:"ceremony", icon:"🎤", pos:[64.2,31.7],
+    blocks:[
+      {s:"08:50",e:"09:40",title:"開幕式",detail:["集合、所長致詞、頒獎、切蛋糕"]},
+      {s:"15:30",e:"16:10",title:"閉幕典禮",detail:["所長致詞、頒獎、摸彩抽獎"]},
+    ], notes:[]},
+  {id:"basketball", name:"籃球場", cat:"competition", icon:"🏀", pos:[76.6,52.8],
+    blocks:[
+      {s:"09:40",e:"09:50",title:"長官示範賽"},
+      {s:"09:50",e:"10:30",title:"挑戰59九宮格",bracket:"九宮格"},
+      {s:"10:30",e:"14:00",title:"棒球九宮格（開放體驗）",detail:["與「挑戰59九宮格」競賽不同活動，同場地開放自由體驗"]},
+    ], notes:["棒球九宮格開放體驗與正式競賽是不同活動，請勿搞混場地"]},
+  {id:"qianzhan", name:"前瞻廳", sub:"服務大樓一樓", cat:"competition", icon:"🎶", pos:[47.5,26.4],
+    blocks:[
+      {s:"10:30",e:"13:30",title:"K歌歡唱時光（自由歡唱）",detail:["非報名賽事，自由上台歡唱"]},
+      {s:"13:50",e:"15:20",title:"個人～K歌大賽（報名制）",detail:["需事先報名"]},
+    ], notes:["自由歡唱與報名制比賽是兩個不同活動，請勿搞混場地調度"]},
+  {id:"canting", name:"餐廳", cat:"casual", icon:"🍿", pos:[28.8,85.4],
+    blocks:[
+      {s:"10:00",e:"14:00",title:"賓果卡摸彩券兌換處",detail:["14:00 截止兌換"]},
+      {s:"10:00",e:"14:00",title:"爆米花機"},
+    ], notes:["賓果卡兌換 14:00 準時截止"]},
+  {id:"jiaoyiting", name:"成源樓交誼廳", cat:"competition", icon:"🏆", pos:[18.9,63.9],
+    blocks:[
+      {s:"10:30",e:"11:10",title:"時空運送特攻隊",rounds:"shikong"},
+      {s:"11:10",e:"11:50",title:"風力盃足球賽",rounds:"fengli"},
+      {s:"13:00",e:"13:30",title:"黏土傳聲筒",rounds:"niantu"},
+      {s:"13:30",e:"13:50",title:"同心協力大作戰",bracket:"同心協力"},
+    ], notes:[]},
+  {id:"caopi", name:"成源樓草皮", cat:"casual", icon:"🎪", pos:[30.6,66.7],
+    blocks:[{s:"10:00",e:"14:30",title:"充氣溜滑梯"}], notes:[]},
+  {id:"huilang", name:"迴廊", sub:"成源樓旁", cat:"casual", icon:"👨‍👩‍👧", pos:[25.8,82.6],
+    blocks:[
+      {s:"10:00",e:"14:00",title:"親子遊戲區"},
+      {s:"11:50",e:"13:00",title:"市集攤商（桌攤）",detail:["園遊券消費"]},
+    ], notes:[]},
+  {id:"dacaopi", name:"大草皮", cat:"market", icon:"🚚", pos:[51.1,62.5],
+    blocks:[{s:"11:50",e:"13:00",title:"市集攤商（餐車）",detail:["園遊券消費"]}], notes:[]},
+  {id:"yanjiu2102", name:"研究大樓2102會議室", cat:"casual", icon:"🎃", pos:[82.7,20.1],
+    blocks:[{s:"10:30",e:"12:00",title:"萬聖節快閃活動",detail:["物資數量有限，送完為止"]}], notes:["物資送完為止"]},
+];
+
+/* ===== LIVE STATE =====
+   This is the only part of the file that changes during the event.
+   Update ranks/pk23/pk56 as prelim results come in, and set `announcement`
+   for the red banner at the top of the page. Keep this block's shape intact. */
+const STATE = {
+  announcement: "",
+  brackets: {
+    "九宮格": {ranks:["","","","","",""], pk23:"", pk56:""},
+    "同心協力": {ranks:["","","","","",""], pk23:"", pk56:""},
+  }
+};
+/* ===== END LIVE STATE ===== */
+
+function esc(s){
+  return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function minutesOf(hhmm){ const [h,m]=hhmm.split(":").map(Number); return h*60+m; }
+function ymd(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function isEventDay(){ return ymd(new Date())===EVENT_DATE; }
+function nowMin(){ const d=new Date(); return d.getHours()*60+d.getMinutes(); }
+
+function isBlockLive(b){ return isEventDay() && nowMin()>=minutesOf(b.s) && nowMin()<minutesOf(b.e); }
+function isBlockPast(b){ return isEventDay() && nowMin()>=minutesOf(b.e); }
+function isVenueLive(v){ return v.blocks.some(isBlockLive); }
+
+function matchRow(label, teams){
+  return `<div class="match"><span class="mlabel">${esc(label)}</span><span class="mteams">${teams.map(esc).join(' vs ')}</span></div>`;
+}
+
+function bracketHTML(key){
+  const b = STATE.brackets[key];
+  const prelim = BRACKET_PRELIM[key];
+  let html = `<div class="bracket"><div class="bstage"><div class="bstage-label">初賽（固定對戰）</div>`
+    + prelim.map(m=>matchRow(m.m, m.teams.map(ts))).join('') + `</div>`;
+  const ranksFilled = b.ranks.every(r=>r && r.trim());
+  if (ranksFilled) {
+    const r = b.ranks.map(x=>x.trim());
+    html += `<div class="bstage"><div class="bstage-label">PK賽</div>`
+      + matchRow("2、3名PK",[r[1],r[2]])
+      + matchRow("5、6名PK",[r[4],r[5]])
+      + `</div>`;
+    if (b.pk23 || b.pk56) {
+      html += `<div class="bstage"><div class="bstage-label">最終賽</div>`
+        + matchRow("冠軍賽",[r[0], b.pk23 || "（待2、3名PK結果）"])
+        + matchRow("4、5名賽",[r[3], b.pk56 || "（待5、6名PK結果）"])
+        + `</div>`;
+    }
+  } else {
+    html += `<div class="bstage-pending">初賽名次尚未公布，公布後將自動顯示 PK 賽與最終賽對戰組合</div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+function bracketSummary(key){
+  const b = STATE.brackets[key];
+  const ranksFilled = b.ranks.every(r=>r && r.trim());
+  if (!ranksFilled) return "初賽階段";
+  if (!b.pk23 && !b.pk56) return "PK賽階段";
+  if (b.pk23 && !b.pk56) return "5、6名PK 進行中";
+  if (!b.pk23 && b.pk56) return "2、3名PK 進行中";
+  return "冠軍賽／4、5名賽階段";
+}
+
+function roundsHTML(key){
+  const rs = ROUNDS[key];
+  return `<div class="bracket">` + rs.map(r=>{
+    const teams = r.teams.map(ts);
+    const label = teams.length>2 ? teams.join('、') : teams.join(' vs ');
+    return `<div class="match"><span class="mlabel">${esc(r.round)}</span><span class="mteams">${esc(label)}</span></div>`;
+  }).join('') + `</div>`;
+}
+
+function venueModalHTML(id){
+  const v = VENUES.find(x=>x.id===id);
+  const blocksHTML = v.blocks.map(b=>{
+    const live = isBlockLive(b), past = isBlockPast(b);
+    let extra = "";
+    if (b.bracket) extra = bracketHTML(b.bracket);
+    else if (b.rounds) extra = roundsHTML(b.rounds);
+    else if (b.detail) extra = `<div class="bdetail">${b.detail.map(esc).join('<br>')}</div>`;
+    return `<div class="vblock ${live?'live':''} ${past?'past':''}">
+      <div class="vblock-head"><span class="vtime tab">${b.s}–${b.e}</span><span class="vtitle">${esc(b.title)}</span>${live?'<span class="nowbadge">LIVE</span>':''}</div>
+      ${extra}
+    </div>`;
+  }).join('');
+  const notesHTML = v.notes && v.notes.length ? `<div class="vnotes"><b>注意事項</b><br>${v.notes.map(esc).join('<br>')}</div>` : '';
+  return `<div class="modalhead"><span class="vicon">${v.icon}</span><div><h3>${esc(v.name)}</h3>${v.sub?`<div class="vsub">${esc(v.sub)}</div>`:''}</div><button type="button" class="closebtn" onclick="closeModal()">✕</button></div>
+  <div class="modalbody">${blocksHTML}${notesHTML}</div>`;
+}
+
+function agendaModalHTML(){
+  const items = [];
+  VENUES.forEach(v=>v.blocks.forEach(b=>items.push({s:b.s,e:b.e,title:b.title,venueId:v.id,venueName:v.name})));
+  items.sort((a,b)=>minutesOf(a.s)-minutesOf(b.s));
+  const rows = items.map(it=>{
+    const live = isEventDay() && nowMin()>=minutesOf(it.s) && nowMin()<minutesOf(it.e);
+    const past = isEventDay() && nowMin()>=minutesOf(it.e);
+    return `<button type="button" class="agitem ${live?'live':''} ${past?'past':''}" onclick="openVenue('${it.venueId}')">
+      <span class="time tab" style="font-size:12px;color:var(--muted)">${it.s}<br>${it.e}</span>
+      <span class="agmain"><span class="agtitle">${esc(it.title)}${live?'<span class="nowbadge">LIVE</span>':''}</span><span class="agvenue">${esc(it.venueName)}</span></span>
+    </button>`;
+  }).join('');
+  return `<div class="modalhead"><span class="vicon">📋</span><div><h3>今日議程</h3><div class="vsub">10/31（六）全天</div></div><button type="button" class="closebtn" onclick="closeModal()">✕</button></div>
+  <div class="modalbody agendalist">${rows}</div>`;
+}
+
+function pinsHTML(){
+  return VENUES.map(v => {
+    const live = isVenueLive(v);
+    return `<button type="button" class="pin cat-${v.cat} ${live?'islive':''}" style="left:${v.pos[0]}%; top:${v.pos[1]}%" onclick="openVenue('${v.id}')" aria-label="${esc(v.name)}" title="${esc(v.name)}">${v.icon}</button>`;
+  }).join('');
+}
+
+function dayStateText(){
+  if (!isEventDay()) {
+    const today = ymd(new Date());
+    return today < EVENT_DATE ? "非活動當天・地圖預覽" : "活動已結束，感謝參加！";
+  }
+  const nm = nowMin();
+  const firstS = Math.min(...VENUES.flatMap(v=>v.blocks.map(b=>minutesOf(b.s))));
+  const lastE = Math.max(...VENUES.flatMap(v=>v.blocks.map(b=>minutesOf(b.e))));
+  if (nm < firstS) return "活動尚未開始";
+  if (nm >= lastE) return "今日活動已結束";
+  return "活動進行中";
+}
+
+function quickCardHTML(key, venueId){
+  const live = STATE.brackets[key] && VENUES.find(v=>v.id===venueId).blocks.some(b=>b.bracket===key && isBlockLive(b));
+  return `<button type="button" class="quickbtn" onclick="openVenue('${venueId}')">
+    <span class="qg">${esc(BRACKET_LABEL[key])}</span>
+    <span class="qs">${esc(bracketSummary(key))}</span>
+    <span class="pill ${live?'live':'idle'}"><span class="dot"></span>${live?'進行中':'非進行中'}</span>
+  </button>`;
+}
+
+function pageBody(){
+  const d = new Date();
+  const hh = String(d.getHours()).padStart(2,"0"), mm = String(d.getMinutes()).padStart(2,"0");
+  return `
+  <header class="top">
+    <div class="htitle">
+      <div class="eyebrow">財團法人食品工業發展研究所・115年(第59屆)所慶</div>
+      <h1 class="title">所慶即時地圖</h1>
+    </div>
+    <div class="clockbox">
+      <div class="clock tab" id="clockDisplay">${hh}:${mm}</div>
+      <div class="daystate" id="dayState">${esc(dayStateText())}</div>
+    </div>
+  </header>
+
+  ${STATE.announcement ? `<div class="banner"><b>公告</b><br>${esc(STATE.announcement)}</div>` : ``}
+
+  <div class="mapsection">
+    <div class="mapwrap">
+      <img src="floorplan.png" alt="所慶場地平面圖，點選圖上色點查看各地點當日活動">
+      <div id="pinlayer">${pinsHTML()}</div>
+    </div>
+    <div class="maphint">點地圖上的圖示，查看該地點當天的活動與對戰組合</div>
+  </div>
+
+  <div class="quickrow">
+    ${quickCardHTML("九宮格","basketball")}
+    ${quickCardHTML("同心協力","jiaoyiting")}
+  </div>
+
+  <button type="button" class="agendabtn" onclick="openAgenda()">📋 查看今日完整議程</button>
+
+  <div class="modal" id="modal" onclick="if(event.target===this) closeModal()">
+    <div class="modalcard" id="modalcard"></div>
+  </div>
+
+  <div class="footnote">財團法人食品工業發展研究所 115年(第59屆)所慶<br>頁面每隔一段時間會自動更新最新戰況</div>
+  `;
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+function openModal(html){
+  document.getElementById('modalcard').innerHTML = html;
+  const m = document.getElementById('modal');
+  m.hidden = false;
+  requestAnimationFrame(()=> m.classList.add('open'));
+}
+function closeModal(){
+  const m = document.getElementById('modal');
+  m.classList.remove('open');
+}
+function openVenue(id){ openModal(venueModalHTML(id)); }
+function openAgenda(){ openModal(agendaModalHTML()); }
+
+function paintClock(){
+  const d = new Date();
+  const el = document.getElementById('clockDisplay');
+  if (el) el.textContent = String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+  const ds = document.getElementById('dayState');
+  if (ds) ds.textContent = dayStateText();
+  const pl = document.getElementById('pinlayer');
+  if (pl) pl.innerHTML = pinsHTML();
+}
+
+document.getElementById('app').innerHTML = pageBody();
+paintClock();
+setInterval(paintClock, 15000);
+
+/* Picks up new match results / announcements automatically: this page is
+   static (hosted on GitHub Pages), so "live" here means it quietly reloads
+   itself every ~28s to pick up whatever the latest deployed version is. */
+setInterval(()=>{ location.reload(); }, 28000);
+</script>
+</body>
+</html>
