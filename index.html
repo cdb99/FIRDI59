@@ -108,7 +108,8 @@ h1.title{font-size:24px; line-height:1.2}
 }
 .modal.open{opacity:1; pointer-events:auto}
 .modalcard{
-  background:var(--bg); width:100%; max-width:720px; max-height:88vh; overflow-y:auto;
+  background:var(--bg); width:100%; max-width:720px; overflow-y:auto; overscroll-behavior:contain;
+  max-height:88vh; max-height:88dvh;
   border-radius:22px 22px 0 0; padding:10px max(16px, env(safe-area-inset-right,0px)) max(20px, env(safe-area-inset-bottom,0px)) max(16px, env(safe-area-inset-left,0px));
   box-shadow:0 -8px 40px rgba(0,0,0,.35);
   transform:translateY(24px); transition:transform .25s cubic-bezier(.2,.8,.3,1);
@@ -246,9 +247,9 @@ const VENUES = [
       {s:"10:00",e:"14:00",title:"親子遊戲區",detail:["免費遊玩，無須園遊券"]},
       {s:"11:50",e:"14:00",title:"市集攤商（桌攤）"},
     ], notes:["12:30 前消費以園遊券為原則，12:30 後開放可全額使用現金消費，園遊券須於13:30 前使用完畢"]},
-  {id:"dacaopi", name:"大草皮", cat:"market", icon:"🚚", pos:[51.1,62.5],
+  {id:"dacaopi", name:"大草皮", cat:"casual", icon:"🚚", pos:[51.1,62.5],
     blocks:[{s:"11:50",e:"14:00",title:"市集攤商（餐車）"}], notes:["12:30 前消費以園遊券為原則，12:30 後開放可全額使用現金消費，園遊券須於13:30 前使用完畢"]},
-  {id:"yanjiu2102", name:"研究大樓2102會議室", cat:"casual", icon:"🎃", pos:[72,19],
+  {id:"yanjiu2102", name:"研究大樓2102會議室", cat:"competition", icon:"🎃", pos:[72,19],
     blocks:[{s:"10:30",e:"12:00",title:"萬聖節快閃活動",detail:["手作體驗活動，體驗包數量有限，送完為止"]}], notes:[]},
 ];
 
