@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>所慶即時地圖</title>
+<title>第59屆所慶活動</title>
 <style>
 :root{
   --bg:#fcfdf8; --surface:#ffffff; --surface-2:#eff4ea;
@@ -36,12 +36,8 @@ button{font-family:inherit}
 img{max-width:100%}
 
 header.top{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:10px; flex-wrap:wrap}
-.htitle{display:flex; flex-direction:column; gap:1px}
-.eyebrow{font-size:12.5px; letter-spacing:.06em; color:var(--muted)}
 h1.title{font-size:24px; line-height:1.2}
-.clockbox{text-align:right}
-.clock{font-family:var(--font-display); font-size:22px}
-.daystate{font-size:13px; color:var(--muted)}
+.daystate{font-size:13px; color:var(--muted); text-align:right}
 
 .banner{
   background:var(--live); color:var(--live-ink); border-radius:14px;
@@ -121,7 +117,7 @@ h1.title{font-size:24px; line-height:1.2}
 .modalcard::before{
   content:""; display:block; width:40px; height:4px; border-radius:999px; background:var(--line); margin:4px auto 12px;
 }
-.modalhead{display:flex; align-items:flex-start; gap:10px; margin-bottom:10px}
+.modalhead{display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; position:sticky; top:0; background:var(--bg); padding-top:4px; z-index:2}
 .modalhead .vicon{font-size:25px; line-height:1.3}
 .modalhead h3{font-size:20px}
 .modalhead .vsub{font-size:13px; color:var(--muted)}
@@ -135,6 +131,7 @@ h1.title{font-size:24px; line-height:1.2}
 .vblock-head{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
 .vtime{font-size:13px; color:var(--muted)}
 .vtitle{font-size:16.5px; font-weight:700}
+.bingotag{font-size:12px; font-weight:400; color:var(--muted)}
 .bdetail{font-size:14.5px; color:var(--muted); margin-top:5px; line-height:1.5}
 .vnotes{font-size:14px; color:var(--muted); background:var(--surface-2); border-radius:12px; padding:11px 13px; line-height:1.6}
 .vnotes b{color:var(--ink); font-family:var(--font-display); font-size:13.5px}
@@ -216,57 +213,54 @@ const BRACKET_LABEL = {"九宮格":"挑戰59九宮格", "同心協力":"同心�
 const VENUES = [
   {id:"siling", name:"司令台", cat:"ceremony", icon:"🎤", pos:[64.2,31.7],
     blocks:[
-      {s:"08:50",e:"09:40",title:"開幕式",detail:["集合、所長致詞、頒獎、切蛋糕"]},
-      {s:"15:30",e:"16:10",title:"閉幕典禮",detail:["所長致詞、頒獎、摸彩抽獎"]},
+      {s:"08:50",e:"09:40",title:"開幕式",detail:["集合、長官致詞、頒獎、切蛋糕"],bingo:1},
+      {s:"15:30",e:"16:10",title:"閉幕典禮",detail:["長官致詞、頒獎、摸彩抽獎"]},
     ], notes:[]},
-  {id:"basketball", name:"籃球場", cat:"competition", icon:"🏀", pos:[76.6,52.8],
+  {id:"basketball", name:"籃球場", cat:"competition", icon:"⚾️", pos:[76.6,52.8],
     blocks:[
-      {s:"09:40",e:"09:50",title:"長官示範賽"},
-      {s:"09:50",e:"10:30",title:"挑戰59九宮格",bracket:"九宮格"},
+      {s:"09:40",e:"09:50",title:"長官示範賽",bingo:1},
+      {s:"09:50",e:"10:30",title:"挑戰59九宮格",bracket:"九宮格",bingo:7},
       {s:"10:30",e:"14:00",title:"棒球九宮格（開放體驗）",detail:["與「挑戰59九宮格」競賽不同活動，同場地開放自由體驗"]},
-    ], notes:["棒球九宮格開放體驗與正式競賽是不同活動，請勿搞混場地"]},
+    ], notes:[]},
   {id:"qianzhan", name:"前瞻廳", sub:"服務大樓一樓", cat:"competition", icon:"🎶", pos:[47.5,26.4],
     blocks:[
       {s:"10:30",e:"13:30",title:"K歌歡唱時光（自由歡唱）",detail:["非報名賽事，自由上台歡唱"]},
       {s:"13:50",e:"15:20",title:"個人～K歌大賽（報名制）",detail:["需事先報名"]},
-    ], notes:["自由歡唱與報名制比賽是兩個不同活動，請勿搞混場地調度"]},
-  {id:"canting", name:"餐廳", cat:"casual", icon:"🍿", pos:[28.8,85.4],
+    ], notes:[]},
+  {id:"canting", name:"員工餐廳", cat:"casual", icon:"🍿", pos:[28.8,85.4],
     blocks:[
-      {s:"10:00",e:"14:00",title:"賓果卡摸彩券兌換處",detail:["14:00 截止兌換"]},
-      {s:"10:00",e:"14:00",title:"爆米花機"},
-    ], notes:["賓果卡兌換 14:00 準時截止"]},
+      {s:"10:00",e:"14:00",title:"摸彩券兌換處",detail:["請至各競賽會場尋找號碼，連成任2條連線（橫、直、對角線皆算），即可兌換摸彩券。","14:00 截止兌換"]},
+      {s:"10:00",e:"14:00",title:"爆米花機",detail:["免費領取，無須園遊券，數量有限，送完為止"]},
+    ], notes:[]},
   {id:"jiaoyiting", name:"成源樓交誼廳", cat:"competition", icon:"🏆", pos:[18.9,63.9],
     blocks:[
-      {s:"10:30",e:"11:10",title:"時空運送特攻隊",rounds:"shikong"},
-      {s:"11:10",e:"11:50",title:"風力盃足球賽",rounds:"fengli"},
-      {s:"13:00",e:"13:30",title:"黏土傳聲筒",rounds:"niantu"},
-      {s:"13:30",e:"13:50",title:"同心協力大作戰",bracket:"同心協力"},
+      {s:"10:30",e:"11:10",title:"時空運送特攻隊",rounds:"shikong",bingo:3},
+      {s:"11:10",e:"11:50",title:"風力盃足球賽",rounds:"fengli",bingo:3},
+      {s:"13:00",e:"13:30",title:"黏土傳聲筒",rounds:"niantu",bingo:2},
+      {s:"13:30",e:"13:50",title:"同心協力大作戰",bracket:"同心協力",bingo:7},
     ], notes:[]},
   {id:"caopi", name:"成源樓草皮", cat:"casual", icon:"🎪", pos:[30.6,66.7],
     blocks:[{s:"10:00",e:"14:30",title:"充氣溜滑梯"}], notes:[]},
-  {id:"huilang", name:"迴廊", sub:"成源樓旁", cat:"casual", icon:"👨‍👩‍👧", pos:[25.8,82.6],
+  {id:"huilang", name:"迴廊", sub:"成源樓旁", cat:"casual", icon:"👨‍👩‍👧", pos:[25,48],
     blocks:[
-      {s:"10:00",e:"14:00",title:"親子遊戲區"},
-      {s:"11:50",e:"13:00",title:"市集攤商（桌攤）",detail:["園遊券消費"]},
-    ], notes:[]},
+      {s:"10:00",e:"14:00",title:"親子遊戲區",detail:["免費遊玩，無須園遊券"]},
+      {s:"11:50",e:"14:00",title:"市集攤商（桌攤）"},
+    ], notes:["12:30 前消費以園遊券為原則，12:30 後開放可全額使用現金消費，園遊券須於13:30 前使用完畢"]},
   {id:"dacaopi", name:"大草皮", cat:"market", icon:"🚚", pos:[51.1,62.5],
-    blocks:[{s:"11:50",e:"13:00",title:"市集攤商（餐車）",detail:["園遊券消費"]}], notes:[]},
-  {id:"yanjiu2102", name:"研究大樓2102會議室", cat:"casual", icon:"🎃", pos:[82.7,20.1],
-    blocks:[{s:"10:30",e:"12:00",title:"萬聖節快閃活動",detail:["物資數量有限，送完為止"]}], notes:["物資送完為止"]},
+    blocks:[{s:"11:50",e:"14:00",title:"市集攤商（餐車）"}], notes:["12:30 前消費以園遊券為原則，12:30 後開放可全額使用現金消費，園遊券須於13:30 前使用完畢"]},
+  {id:"yanjiu2102", name:"研究大樓2102會議室", cat:"casual", icon:"🎃", pos:[72,19],
+    blocks:[{s:"10:30",e:"12:00",title:"萬聖節快閃活動",detail:["手作體驗活動，體驗包數量有限，送完為止"]}], notes:[]},
 ];
 
-/* ===== LIVE STATE =====
-   This is the only part of the file that changes during the event.
-   Update ranks/pk23/pk56 as prelim results come in, and set `announcement`
-   for the red banner at the top of the page. Keep this block's shape intact. */
-const STATE = {
+/* Live match results live in the separate status.json file (fetched below),
+   not in this file — that's the only file that needs updating on event day. */
+let STATE = {
   announcement: "",
   brackets: {
     "九宮格": {ranks:["","","","","",""], pk23:"", pk56:""},
     "同心協力": {ranks:["","","","","",""], pk23:"", pk56:""},
   }
 };
-/* ===== END LIVE STATE ===== */
 
 function esc(s){
   return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -297,9 +291,9 @@ function bracketHTML(key){
       + matchRow("5、6名PK",[r[4],r[5]])
       + `</div>`;
     if (b.pk23 || b.pk56) {
-      html += `<div class="bstage"><div class="bstage-label">最終賽</div>`
-        + matchRow("冠軍賽",[r[0], b.pk23 || "（待2、3名PK結果）"])
+      html += `<div class="bstage"><div class="bstage-label">最終賽（冠軍賽壓軸）</div>`
         + matchRow("4、5名賽",[r[3], b.pk56 || "（待5、6名PK結果）"])
+        + matchRow("冠軍賽",[r[0], b.pk23 || "（待2、3名PK結果）"])
         + `</div>`;
     }
   } else {
@@ -336,7 +330,7 @@ function venueModalHTML(id){
     else if (b.rounds) extra = roundsHTML(b.rounds);
     else if (b.detail) extra = `<div class="bdetail">${b.detail.map(esc).join('<br>')}</div>`;
     return `<div class="vblock ${live?'live':''} ${past?'past':''}">
-      <div class="vblock-head"><span class="vtime tab">${b.s}–${b.e}</span><span class="vtitle">${esc(b.title)}</span>${live?'<span class="nowbadge">LIVE</span>':''}</div>
+      <div class="vblock-head"><span class="vtime tab">${b.s}–${b.e}</span><span class="vtitle">${esc(b.title)}</span>${b.bingo?`<span class="bingotag">（公告賓果數字*${b.bingo}）</span>`:''}${live?'<span class="nowbadge">LIVE</span>':''}</div>
       ${extra}
     </div>`;
   }).join('');
@@ -371,7 +365,7 @@ function pinsHTML(){
 function dayStateText(){
   if (!isEventDay()) {
     const today = ymd(new Date());
-    return today < EVENT_DATE ? "非活動當天・地圖預覽" : "活動已結束，感謝參加！";
+    return today < EVENT_DATE ? "" : "活動已結束，感謝參加！";
   }
   const nm = nowMin();
   const firstS = Math.min(...VENUES.flatMap(v=>v.blocks.map(b=>minutesOf(b.s))));
@@ -391,18 +385,10 @@ function quickCardHTML(key, venueId){
 }
 
 function pageBody(){
-  const d = new Date();
-  const hh = String(d.getHours()).padStart(2,"0"), mm = String(d.getMinutes()).padStart(2,"0");
   return `
   <header class="top">
-    <div class="htitle">
-      <div class="eyebrow">財團法人食品工業發展研究所・115年(第59屆)所慶</div>
-      <h1 class="title">所慶即時地圖</h1>
-    </div>
-    <div class="clockbox">
-      <div class="clock tab" id="clockDisplay">${hh}:${mm}</div>
-      <div class="daystate" id="dayState">${esc(dayStateText())}</div>
-    </div>
+    <h1 class="title">第59屆所慶活動</h1>
+    <div class="daystate" id="dayState">${esc(dayStateText())}</div>
   </header>
 
   ${STATE.announcement ? `<div class="banner"><b>公告</b><br>${esc(STATE.announcement)}</div>` : ``}
@@ -451,23 +437,31 @@ function openVenue(id){ openModal(venueModalHTML(id)); }
 function openAgenda(){ openModal(agendaModalHTML()); }
 
 function paintClock(){
-  const d = new Date();
-  const el = document.getElementById('clockDisplay');
-  if (el) el.textContent = String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
   const ds = document.getElementById('dayState');
   if (ds) ds.textContent = dayStateText();
   const pl = document.getElementById('pinlayer');
   if (pl) pl.innerHTML = pinsHTML();
 }
 
-document.getElementById('app').innerHTML = pageBody();
-paintClock();
-setInterval(paintClock, 15000);
+async function loadState(){
+  try {
+    const res = await fetch('status.json?t=' + Date.now(), {cache:"no-store"});
+    if (res.ok) STATE = await res.json();
+  } catch(e) { /* keep last-known STATE if offline/unreachable */ }
+}
 
-/* Picks up new match results / announcements automatically: this page is
-   static (hosted on GitHub Pages), so "live" here means it quietly reloads
-   itself every ~28s to pick up whatever the latest deployed version is. */
-setInterval(()=>{ location.reload(); }, 28000);
+async function refresh(){
+  await loadState();
+  document.getElementById('app').innerHTML = pageBody();
+  paintClock();
+}
+
+/* Picks up new match results / announcements automatically: every ~20s the
+   page quietly re-fetches status.json and re-renders — no manual refresh
+   needed. Updating status.json on GitHub is all that's needed to go live. */
+refresh();
+setInterval(paintClock, 15000);
+setInterval(refresh, 20000);
 </script>
 </body>
 </html>
