@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>第59屆所慶活動</title>
+<meta name="description" content="財團法人食品工業發展研究所 115年(第59屆)所慶 — 即時場地地圖與賽程">
+<meta property="og:title" content="第59屆所慶活動">
+<meta property="og:description" content="財團法人食品工業發展研究所 115年(第59屆)所慶 — 即時場地地圖與賽程">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://cdb99.github.io/FIRDI59/">
+<meta property="og:image" content="https://cdb99.github.io/FIRDI59/floorplan.png">
 <style>
 :root{
   --bg:#fcfdf8; --surface:#ffffff; --surface-2:#eff4ea;
@@ -22,7 +28,7 @@
 html,body{background:var(--bg)}
 body{
   background:var(--bg); color:var(--ink);
-  font-family:var(--font-body); font-size:18px;
+  font-family:var(--font-body); font-size:21px;
   margin:0;
   padding-left:max(16px, env(safe-area-inset-left,0px));
   padding-right:max(16px, env(safe-area-inset-right,0px));
@@ -36,14 +42,14 @@ button{font-family:inherit}
 img{max-width:100%}
 
 header.top{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:10px; flex-wrap:wrap}
-h1.title{font-size:24px; line-height:1.2}
-.daystate{font-size:13px; color:var(--muted); text-align:right}
+h1.title{font-size:28px; line-height:1.2}
+.daystate{font-size:15px; color:var(--muted); text-align:right}
 
 .banner{
   background:var(--live); color:var(--live-ink); border-radius:14px;
-  padding:12px 14px; margin-bottom:12px; font-size:15px; line-height:1.5;
+  padding:12px 14px; margin-bottom:12px; font-size:17px; line-height:1.5;
 }
-.banner b{font-family:var(--font-display); font-size:13px; letter-spacing:.04em}
+.banner b{font-family:var(--font-display); font-size:15px; letter-spacing:.04em}
 
 .mapsection{width:100vw; margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw); margin-bottom:14px}
 .mapwrap{position:relative; width:100%; background:var(--surface); overflow:hidden; border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
@@ -67,7 +73,7 @@ h1.title{font-size:24px; line-height:1.2}
 }
 @media (prefers-reduced-motion: reduce){ .pin.islive{animation:none} }
 .maphint{
-  font-size:13px; color:var(--muted); text-align:center; padding:6px max(16px, env(safe-area-inset-left,0px)) 0;
+  font-size:15px; color:var(--muted); text-align:center; padding:6px max(16px, env(safe-area-inset-left,0px)) 0;
 }
 
 .quickrow{display:flex; gap:10px; margin-bottom:14px}
@@ -75,18 +81,18 @@ h1.title{font-size:24px; line-height:1.2}
   flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; text-align:left;
   background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:10px 12px; cursor:pointer; color:var(--ink);
 }
-.quickbtn .qg{font-size:13px; color:var(--muted)}
-.quickbtn .qs{font-size:15px; font-weight:700; overflow-wrap:break-word}
+.quickbtn .qg{font-size:15px; color:var(--muted)}
+.quickbtn .qs{font-size:18px; font-weight:700; overflow-wrap:break-word}
 .quickbtn .pill{margin-top:2px}
 
 .agendabtn{
   display:flex; align-items:center; justify-content:center; gap:8px; width:100%;
   background:var(--accent); border:none; border-radius:14px; padding:13px; margin-bottom:18px;
-  font-size:16px; font-weight:700; color:var(--accent-ink); cursor:pointer;
+  font-size:19px; font-weight:700; color:var(--accent-ink); cursor:pointer;
 }
 
 .pill{
-  display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700;
+  display:inline-flex; align-items:center; gap:5px; font-size:13.5px; font-weight:700;
   letter-spacing:.03em; padding:2px 8px; border-radius:999px; width:fit-content;
 }
 .pill.live{background:var(--live); color:var(--live-ink)}
@@ -95,7 +101,7 @@ h1.title{font-size:24px; line-height:1.2}
 
 .toast{
   position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:var(--ink); color:var(--bg);
-  padding:10px 16px; border-radius:999px; font-size:13px; opacity:0; pointer-events:none; transition:opacity .25s;
+  padding:10px 16px; border-radius:999px; font-size:15px; opacity:0; pointer-events:none; transition:opacity .25s;
   z-index:80; max-width:90vw; text-align:center;
 }
 .toast.show{opacity:1}
@@ -119,28 +125,28 @@ h1.title{font-size:24px; line-height:1.2}
   content:""; display:block; width:40px; height:4px; border-radius:999px; background:var(--line); margin:4px auto 12px;
 }
 .modalhead{display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; position:sticky; top:0; background:var(--bg); padding-top:4px; z-index:2}
-.modalhead .vicon{font-size:25px; line-height:1.3}
-.modalhead h3{font-size:20px}
-.modalhead .vsub{font-size:13px; color:var(--muted)}
+.modalhead .vicon{font-size:28px; line-height:1.3}
+.modalhead h3{font-size:24px}
+.modalhead .vsub{font-size:15px; color:var(--muted)}
 .modalhead .closebtn{
   margin-left:auto; width:36px; height:36px; border-radius:50%; border:none; background:var(--surface-2);
-  color:var(--ink); font-size:16px; cursor:pointer; flex:none;
+  color:var(--ink); font-size:18px; cursor:pointer; flex:none;
 }
 .vblock{border:1px solid var(--line); background:var(--surface); border-radius:14px; padding:12px 14px; margin-bottom:10px}
 .vblock.live{border-color:var(--live); background:color-mix(in srgb, var(--live) 10%, var(--surface))}
 .vblock.past{opacity:.55}
 .vblock-head{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
-.vtime{font-size:13px; color:var(--muted)}
-.vtitle{font-size:16.5px; font-weight:700}
-.bingotag{font-size:12px; font-weight:400; color:var(--muted)}
-.bdetail{font-size:14.5px; color:var(--muted); margin-top:5px; line-height:1.5}
-.vnotes{font-size:14px; color:var(--muted); background:var(--surface-2); border-radius:12px; padding:11px 13px; line-height:1.6}
-.vnotes b{color:var(--ink); font-family:var(--font-display); font-size:13.5px}
+.vtime{font-size:15px; color:var(--muted)}
+.vtitle{font-size:19.5px; font-weight:700}
+.bingotag{font-size:14.5px; font-weight:400; color:var(--muted)}
+.bdetail{font-size:17px; color:var(--muted); margin-top:5px; line-height:1.5}
+.vnotes{font-size:16.5px; color:var(--muted); background:var(--surface-2); border-radius:12px; padding:11px 13px; line-height:1.6}
+.vnotes b{color:var(--ink); font-family:var(--font-display); font-size:16px}
 
 .bracket{margin-top:8px; display:flex; flex-direction:column; gap:8px}
-.bstage-label{font-size:12px; color:var(--muted); letter-spacing:.04em; margin-bottom:4px}
-.bstage-pending{font-size:14px; color:var(--muted); font-style:italic}
-.match{display:flex; justify-content:space-between; gap:10px; font-size:14.5px; padding:6px 0; border-top:1px solid var(--line)}
+.bstage-label{font-size:14px; color:var(--muted); letter-spacing:.04em; margin-bottom:4px}
+.bstage-pending{font-size:16.5px; color:var(--muted); font-style:italic}
+.match{display:flex; justify-content:space-between; gap:10px; font-size:17px; padding:6px 0; border-top:1px solid var(--line)}
 .match:first-child{border-top:none}
 .mlabel{color:var(--muted); flex:none}
 .mteams{text-align:right; font-weight:600; overflow-wrap:break-word; min-width:0}
@@ -154,11 +160,11 @@ h1.title{font-size:24px; line-height:1.2}
 .agitem.past{opacity:.5}
 .agitem.live .agtitle{color:var(--live)}
 .agmain{display:flex; flex-direction:column; min-width:0}
-.agtitle{font-size:15.5px; font-weight:600}
-.agvenue{font-size:13px; color:var(--muted)}
-.nowbadge{display:inline-block; font-size:10.5px; font-weight:700; color:var(--live); border:1px solid var(--live); border-radius:999px; padding:0 5px; margin-left:5px; vertical-align:1px}
+.agtitle{font-size:18px; font-weight:600}
+.agvenue{font-size:15px; color:var(--muted)}
+.nowbadge{display:inline-block; font-size:12.5px; font-weight:700; color:var(--live); border:1px solid var(--live); border-radius:999px; padding:0 5px; margin-left:5px; vertical-align:1px}
 
-.footnote{margin-top:26px; font-size:12px; color:var(--muted); text-align:center; line-height:1.6}
+.footnote{margin-top:26px; font-size:14px; color:var(--muted); text-align:center; line-height:1.6}
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 </head>
@@ -245,10 +251,10 @@ const VENUES = [
   {id:"huilang", name:"迴廊", sub:"成源樓旁", cat:"casual", icon:"👨‍👩‍👧", pos:[25,48],
     blocks:[
       {s:"10:00",e:"14:00",title:"親子遊戲區",detail:["免費遊玩，無須園遊券"]},
-      {s:"11:50",e:"14:00",title:"市集攤商（桌攤）"},
+      {s:"10:30",e:"14:00",title:"市集攤商（桌攤）"},
     ], notes:["12:30 前消費以園遊券為原則，12:30 後開放可全額使用現金消費，園遊券須於13:30 前使用完畢"]},
   {id:"dacaopi", name:"大草皮", cat:"casual", icon:"🚚", pos:[51.1,62.5],
-    blocks:[{s:"11:50",e:"14:00",title:"市集攤商（餐車）"}], notes:["12:30 前消費以園遊券為原則，12:30 後開放可全額使用現金消費，園遊券須於13:30 前使用完畢"]},
+    blocks:[{s:"10:30",e:"14:00",title:"市集攤商（餐車）"}], notes:["12:30 前消費以園遊券為原則，12:30 後開放可全額使用現金消費，園遊券須於13:30 前使用完畢"]},
   {id:"yanjiu2102", name:"研究大樓2102會議室", cat:"competition", icon:"🎃", pos:[72,19],
     blocks:[{s:"10:30",e:"12:00",title:"萬聖節快閃活動",detail:["手作體驗活動，體驗包數量有限，送完為止"]}], notes:[]},
 ];
@@ -348,7 +354,7 @@ function agendaModalHTML(){
     const live = isEventDay() && nowMin()>=minutesOf(it.s) && nowMin()<minutesOf(it.e);
     const past = isEventDay() && nowMin()>=minutesOf(it.e);
     return `<button type="button" class="agitem ${live?'live':''} ${past?'past':''}" onclick="openVenue('${it.venueId}')">
-      <span class="time tab" style="font-size:12px;color:var(--muted)">${it.s}<br>${it.e}</span>
+      <span class="time tab" style="font-size:14px;color:var(--muted)">${it.s}<br>${it.e}</span>
       <span class="agmain"><span class="agtitle">${esc(it.title)}${live?'<span class="nowbadge">LIVE</span>':''}</span><span class="agvenue">${esc(it.venueName)}</span></span>
     </button>`;
   }).join('');
