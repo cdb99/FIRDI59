@@ -165,6 +165,15 @@ h1.title{font-size:28px; line-height:1.2}
 .nowbadge{display:inline-block; font-size:12.5px; font-weight:700; color:var(--live); border:1px solid var(--live); border-radius:999px; padding:0 5px; margin-left:5px; vertical-align:1px}
 
 .footnote{margin-top:26px; font-size:14px; color:var(--muted); text-align:center; line-height:1.6}
+
+/* Desktop/larger screens: the mobile-only full-bleed map hack (width:100vw)
+   is cancelled so the map stays the same width as the rest of the content
+   instead of stretching to the full browser window. */
+@media (min-width:760px){
+  body{max-width:760px}
+  .mapsection{width:auto; margin-left:0; margin-right:0}
+  .mapwrap{border-radius:16px; border:1px solid var(--line)}
+}
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 </head>
